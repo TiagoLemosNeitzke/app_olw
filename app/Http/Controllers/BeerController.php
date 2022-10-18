@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BeerExport;
 use App\Http\Requests\BeerRequest;
 use App\Services\PunkapiService;
 use PhpParser\Node\Expr\FuncCall;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BeerController extends Controller
 {
@@ -13,8 +15,15 @@ class BeerController extends Controller
         return $service->getBeers(...$request->validated());
     }
 
-    public function export()
+    public function export(BeerRequest $request, PunkapiService $service)
     {
-        return 'export';
+        $beers = $service->getBeers(...$request->validated());
+
+        $filteredBeers = collect($beers)->map(function ($value, $key) {
+            return collect($value)->only(['name', 'tagline', 'first_brewed', 'description'])->toArray();
+        })->toArray();
+
+        Excel::store(new BeerExport($filteredBeers), 'olw-report.xlsx', 's3');
+        return 'realtório criado';
     }
 }
