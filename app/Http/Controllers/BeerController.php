@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BeerRequest;
 use App\Services\PunkapiService;
-use Illuminate\Http\Request;
 use PhpParser\Node\Expr\FuncCall;
 
 class BeerController extends Controller
 {
-    public function index(Request $request, PunkapiService $service)
+    public function index(BeerRequest $request, PunkapiService $service)
     {
-        $params = $request->all();
-        return $service->getBeers(...$params);
+        return $service->getBeers(...$request->validated());
     }
 
     public function export()
