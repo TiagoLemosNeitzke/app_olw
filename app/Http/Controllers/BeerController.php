@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Service\PunkapiService;
+use App\Services\PunkapiService;
 use Illuminate\Http\Request;
 use PhpParser\Node\Expr\FuncCall;
 
