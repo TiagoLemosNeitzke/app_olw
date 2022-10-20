@@ -34,9 +34,9 @@ Route::group([
     'prefix' => 'beers',
     'middleware' => 'auth'
 ], function () {
-    Route::get('/', [App\Http\Controllers\BeerController::class, 'index']);
+    Route::get('/', [App\Http\Controllers\BeerController::class, 'index'])->name('beers');
 
-    Route::get('/export', [App\Http\Controllers\BeerController::class, 'export']);
+    Route::post('/export', [App\Http\Controllers\BeerController::class, 'export'])->name('beers.export');
 
-    Route::resource('reports', App\Http\Controllers\ExportController::class)->only('index', 'destroy');
+    Route::resource('reports', App\Http\Controllers\ExportController::class)->only('index', 'show', 'destroy');
 });

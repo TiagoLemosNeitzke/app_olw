@@ -9,17 +9,29 @@ use App\Jobs\SendExportEmailJob;
 use App\Jobs\StoreExportDataJob;
 use App\Mail\ExportEmail;
 use App\Models\Export;
+use App\Models\Meal;
 use App\Services\PunkapiService;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Expr\FuncCall;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Mail;
+use Inertia\Inertia;
 
 class BeerController extends Controller
 {
     public function index(BeerRequest $request, PunkapiService $service)
     {
-        return $service->getBeers(...$request->validated());
+        $filters = $request->validated();
+
+        $beers = $service->getBeers(...$filters);
+
+        $meals = Meal::all();
+
+        return Inertia::render('Beers', [
+            'beers' => $beers,
+            'meals' => $meals,
+            'filters' => $request->validated()
+        ]);
     }
 
     public function export(BeerRequest $request, PunkapiService $service)
@@ -31,6 +43,6 @@ class BeerController extends Controller
             new StoreExportDataJob(auth()->user(), $filename)
         ])->dispatch($request->validated(), $filename);
 
-        return 'realtório criado';
+        return redirect()->back()->with('success', 'Seu arquivo foi enviado para o processamento e em breve estará em seu e-mail.');
     }
 }

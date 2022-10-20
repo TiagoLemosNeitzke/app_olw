@@ -5,33 +5,36 @@ namespace App\Http\Controllers;
 use App\Models\Export;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class ExportController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        $export = Export::paginate(15);
+        $exports = Export::paginate(5);
 
-        dd($export);
+        return Inertia::render('Reports', [
+            'exports' => $exports
+        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Export  $export
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Export $export)
+    public function show($export)
     {
-        Storage::delete($export->file_name);
+        $export = Export::find($export);
 
-        $export->delete();
+        return Storage::download($export->file_name);
+    }
 
-        return 'Deletado';
+    public function destroy($export)
+    {
+        $export = Export::find($export);
+
+        if ($export) {
+            Storage::delete($export->file_name);
+            $export->delete();
+        }
+
+        return redirect()->back()
+            ->with('success', 'Seu arquivo foi removido com sucesso');
     }
 }
